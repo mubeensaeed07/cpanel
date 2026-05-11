@@ -85,6 +85,18 @@
                             <span class="side-menu__label">Admins</span>
                         </a>
                     </li>
+                    <li class="slide">
+                        <a href="{{ route('integrations.google-drive.index') }}" class="side-menu__item {{ request()->routeIs('integrations.google-drive.*') ? 'active' : '' }}">
+                            <i class="bx bxl-google side-menu__icon"></i>
+                            <span class="side-menu__label">Google Drive</span>
+                        </a>
+                    </li>
+                    <li class="slide">
+                        <a href="{{ route('integrations.jellyfin.index') }}" class="side-menu__item {{ request()->routeIs('integrations.jellyfin.*') ? 'active' : '' }}">
+                            <i class="bx bx-tv side-menu__icon"></i>
+                            <span class="side-menu__label">Jellyfin</span>
+                        </a>
+                    </li>
 
                     <li class="slide__category"><span class="category-name">Modules</span></li>
                     @foreach(config('modules') as $moduleKey => $moduleName)

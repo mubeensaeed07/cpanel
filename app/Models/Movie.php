@@ -16,6 +16,10 @@ class Movie extends Model
         'slug',
         'description',
         'status',
+        'imdb_id',
+        'poster_url',
+        'release_year',
+        'imdb_rating',
         'created_by',
     ];
 

@@ -40,6 +40,38 @@ abstract class AdminModulePostController extends Controller
      */
     abstract protected static function definition(): array;
 
+    /**
+     * Override in a child module when extra fields are needed.
+     *
+     * @return array<string, mixed>
+     */
+    protected function extraValidationRules(): array
+    {
+        return [];
+    }
+
+    /**
+     * Override in a child module to persist extra module-specific values on create.
+     *
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    protected function extraCreatePayload(array $validated): array
+    {
+        return [];
+    }
+
+    /**
+     * Override in a child module to persist extra module-specific values on update.
+     *
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    protected function extraUpdatePayload(array $validated): array
+    {
+        return [];
+    }
+
     public function index(Request $request): View
     {
         $def = static::definition();
@@ -82,7 +114,7 @@ abstract class AdminModulePostController extends Controller
         /** @var class-string<Model> $modelClass */
         $modelClass = $def['model'];
 
-        $validated = $request->validate([
+        $validated = $request->validate(array_merge([
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -91,20 +123,20 @@ abstract class AdminModulePostController extends Controller
             'downloads.*.label' => ['nullable', 'string', 'max:255'],
             'downloads.*.file_url' => ['nullable', 'string', 'max:2000'],
             'downloads.*.file_name' => ['nullable', 'string', 'max:255'],
-        ]);
+        ], $this->extraValidationRules()));
 
         $slug = $this->uniqueSlug($modelClass, $adminId, $validated['slug'] ?? null, $validated['title'], null, $def['slug_fallback']);
         $downloads = $this->normalizeDownloads($validated['downloads'] ?? []);
 
         DB::transaction(function () use ($modelClass, $def, $adminId, $validated, $slug, $downloads): void {
             /** @var Model $post */
-            $post = $modelClass::create([
+            $post = $modelClass::create(array_merge([
                 'title' => $validated['title'],
                 'slug' => $slug,
                 'description' => $validated['description'] ?? null,
                 'status' => $validated['status'],
                 'created_by' => $adminId,
-            ]);
+            ], $this->extraCreatePayload($validated)));
             $this->syncDownloadLinks($def, $post, $downloads);
         });
 
@@ -157,7 +189,7 @@ abstract class AdminModulePostController extends Controller
         /** @var Model $record */
         $record = $modelClass::query()->where('created_by', $adminId)->findOrFail($id);
 
-        $validated = $request->validate([
+        $validated = $request->validate(array_merge([
             'title' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -166,18 +198,18 @@ abstract class AdminModulePostController extends Controller
             'downloads.*.label' => ['nullable', 'string', 'max:255'],
             'downloads.*.file_url' => ['nullable', 'string', 'max:2000'],
             'downloads.*.file_name' => ['nullable', 'string', 'max:255'],
-        ]);
+        ], $this->extraValidationRules()));
 
         $slug = $this->uniqueSlug($modelClass, $adminId, $validated['slug'] ?? null, $validated['title'], (int) $record->getKey(), $def['slug_fallback']);
         $downloads = $this->normalizeDownloads($validated['downloads'] ?? []);
 
         DB::transaction(function () use ($def, $record, $validated, $slug, $downloads): void {
-            $record->update([
+            $record->update(array_merge([
                 'title' => $validated['title'],
                 'slug' => $slug,
                 'description' => $validated['description'] ?? null,
                 'status' => $validated['status'],
-            ]);
+            ], $this->extraUpdatePayload($validated)));
             $record->downloadLinks()->delete();
             $this->syncDownloadLinks($def, $record, $downloads);
         });

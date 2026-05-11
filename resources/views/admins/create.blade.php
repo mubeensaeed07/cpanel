@@ -57,6 +57,50 @@
                 </div>
             </div>
 
+            <div class="card custom-card mt-4 mb-0">
+                <div class="card-header">
+                    <div class="card-title">Google Drive Access</div>
+                </div>
+                <div class="card-body">
+                    @if($driveConnected)
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="connect_g_drive" value="1" id="connect_g_drive"
+                                {{ old('connect_g_drive') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="connect_g_drive">
+                                Connect G Drive for this admin
+                            </label>
+                        </div>
+                        <div class="form-text">After create, open this admin and click Fetch to import Drive content.</div>
+                    @else
+                        <div class="alert alert-warning mb-0">
+                            Super Admin Google Drive is not connected yet. Connect it first from Google Drive section.
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="card custom-card mt-4 mb-0">
+                <div class="card-header">
+                    <div class="card-title">Jellyfin Access</div>
+                </div>
+                <div class="card-body">
+                    @if($jellyfinConnected)
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="connect_jellyfin" value="1" id="connect_jellyfin"
+                                {{ old('connect_jellyfin') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="connect_jellyfin">
+                                Connect Jellyfin for this admin
+                            </label>
+                        </div>
+                        <div class="form-text">After create, open this admin and click Scan from Jellyfin to import metadata/content.</div>
+                    @else
+                        <div class="alert alert-warning mb-0">
+                            Jellyfin is not connected yet. Connect it first from Jellyfin integration section.
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             <div class="mt-4 d-flex gap-2">
                 <button type="submit" class="btn btn-primary">Create Admin</button>
                 <a href="{{ route('admins.index') }}" class="btn btn-secondary">Cancel</a>

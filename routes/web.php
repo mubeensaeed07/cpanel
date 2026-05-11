@@ -12,6 +12,8 @@ use App\Http\Controllers\AdminWallpaperController;
 use App\Http\Controllers\AdminWebTvController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SuperAdminGoogleDriveController;
+use App\Http\Controllers\SuperAdminJellyfinController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route('login'));
@@ -55,6 +57,10 @@ Route::middleware(['admin.auth', 'no.cache.auth'])->prefix('admin')->group(funct
                 ]);
         });
     }
+
+    Route::middleware(['admin.module:movies'])
+        ->get('/movies/imdb/lookup', [AdminMovieController::class, 'imdbLookup'])
+        ->name('admin.movies.imdb.lookup');
 });
 
 Route::middleware(['super_admin.auth', 'no.cache.auth'])->group(function (): void {
@@ -66,6 +72,16 @@ Route::middleware(['super_admin.auth', 'no.cache.auth'])->group(function (): voi
     Route::post('/admins', [AdminController::class, 'store'])->name('admins.store');
     Route::get('/admins/{admin}', [AdminController::class, 'show'])->name('admins.show');
     Route::put('/admins/{admin}', [AdminController::class, 'update'])->name('admins.update');
+    Route::post('/admins/{admin}/gdrive/fetch', [AdminController::class, 'fetchGoogleDrive'])->name('admins.gdrive.fetch');
+    Route::post('/admins/{admin}/jellyfin/fetch', [AdminController::class, 'fetchJellyfin'])->name('admins.jellyfin.fetch');
+
+    Route::get('/integrations/google-drive', [SuperAdminGoogleDriveController::class, 'index'])->name('integrations.google-drive.index');
+    Route::get('/integrations/google-drive/redirect', [SuperAdminGoogleDriveController::class, 'redirect'])->name('integrations.google-drive.redirect');
+    Route::get('/integrations/google-drive/callback', [SuperAdminGoogleDriveController::class, 'callback'])->name('integrations.google-drive.callback');
+    Route::delete('/integrations/google-drive', [SuperAdminGoogleDriveController::class, 'disconnect'])->name('integrations.google-drive.disconnect');
+    Route::get('/integrations/jellyfin', [SuperAdminJellyfinController::class, 'index'])->name('integrations.jellyfin.index');
+    Route::post('/integrations/jellyfin', [SuperAdminJellyfinController::class, 'save'])->name('integrations.jellyfin.save');
+    Route::delete('/integrations/jellyfin', [SuperAdminJellyfinController::class, 'disconnect'])->name('integrations.jellyfin.disconnect');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

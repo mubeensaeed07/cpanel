@@ -88,10 +88,82 @@
                     </div>
                 </div>
 
+                <div class="card custom-card mt-4 mb-0">
+                    <div class="card-header">
+                        <div class="card-title">Google Drive Access</div>
+                    </div>
+                    <div class="card-body">
+                        @if(! $driveConnected)
+                            <div class="alert alert-warning mb-0">
+                                Super Admin Google Drive is not connected yet. Connect it first from Google Drive section.
+                            </div>
+                        @else
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="connect_g_drive" value="1" id="connect_g_drive"
+                                    {{ old('connect_g_drive', $admin->connect_g_drive) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="connect_g_drive">Connect G Drive for this admin</label>
+                            </div>
+                            <div class="small text-muted">
+                                Sync status: <strong>{{ $admin->gdrive_sync_status ?? 'not started' }}</strong>
+                                @if($admin->gdrive_last_synced_at)
+                                    | Last synced: {{ $admin->gdrive_last_synced_at->format('d M Y h:i A') }}
+                                @endif
+                            </div>
+                            @if($admin->gdrive_last_error)
+                                <div class="alert alert-danger mt-2 mb-0">{{ $admin->gdrive_last_error }}</div>
+                            @endif
+                            <div class="mt-3 d-flex gap-2">
+                                <button type="button" class="btn btn-primary" onclick="document.getElementById('gdrive-fetch-form').submit();">
+                                    Fetch from Google Drive
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="card custom-card mt-4 mb-0">
+                    <div class="card-header">
+                        <div class="card-title">Jellyfin Access</div>
+                    </div>
+                    <div class="card-body">
+                        @if(! $jellyfinConnected)
+                            <div class="alert alert-warning mb-0">
+                                Jellyfin is not connected yet. Connect it from Jellyfin integration section first.
+                            </div>
+                        @else
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="connect_jellyfin" value="1" id="connect_jellyfin"
+                                    {{ old('connect_jellyfin', $admin->connect_jellyfin) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="connect_jellyfin">Connect Jellyfin for this admin</label>
+                            </div>
+                            <div class="small text-muted">
+                                Sync status: <strong>{{ $admin->jellyfin_sync_status ?? 'not started' }}</strong>
+                                @if($admin->jellyfin_last_synced_at)
+                                    | Last synced: {{ $admin->jellyfin_last_synced_at->format('d M Y h:i A') }}
+                                @endif
+                            </div>
+                            @if($admin->jellyfin_last_error)
+                                <div class="alert alert-danger mt-2 mb-0">{{ $admin->jellyfin_last_error }}</div>
+                            @endif
+                            <div class="mt-3 d-flex gap-2">
+                                <button type="button" class="btn btn-primary" onclick="document.getElementById('jellyfin-fetch-form').submit();">
+                                    Scan from Jellyfin
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
                 <div class="mt-4">
                     <button type="submit" class="btn btn-primary">Save changes</button>
                 </div>
             </form>
         </div>
     </div>
+    <form id="gdrive-fetch-form" method="POST" action="{{ route('admins.gdrive.fetch', $admin) }}" class="d-none">
+        @csrf
+    </form>
+    <form id="jellyfin-fetch-form" method="POST" action="{{ route('admins.jellyfin.fetch', $admin) }}" class="d-none">
+        @csrf
+    </form>
 @endsection

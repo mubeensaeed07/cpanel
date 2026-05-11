@@ -16,6 +16,14 @@ class Admin extends Model
         'password',
         'password_display_encrypted',
         'module_permissions',
+        'connect_g_drive',
+        'connect_jellyfin',
+        'gdrive_last_synced_at',
+        'gdrive_sync_status',
+        'gdrive_last_error',
+        'jellyfin_last_synced_at',
+        'jellyfin_sync_status',
+        'jellyfin_last_error',
     ];
 
     protected $hidden = [
@@ -28,6 +36,10 @@ class Admin extends Model
         return [
             'module_permissions' => 'array',
             'password' => 'hashed',
+            'connect_g_drive' => 'boolean',
+            'connect_jellyfin' => 'boolean',
+            'gdrive_last_synced_at' => 'datetime',
+            'jellyfin_last_synced_at' => 'datetime',
         ];
     }
 
